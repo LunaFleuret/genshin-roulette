@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>原神キャラルーレット</title>
+    <style>
+        /* 見た目を整えるための簡単なCSS */
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f0f2f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+        h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .filters label {
+            display: inline-block;
+            margin: 5px;
+        }
+        #roulette-display {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #aaa;
+        }
+        #roulette-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .buttons button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>原神キャラルーレット</h1>
+
+        <div class="filters">
+            <h2>レアリティ</h2>
+            <label><input type="checkbox" name="rarity" value="5"> ☆5</label>
+            <label><input type="checkbox" name="rarity" value="4"> ☆4</label>
+
+            <h2>元素タイプ</h2>
+            <label><input type="checkbox" name="element" value="炎"> 炎</label>
+            <label><input type="checkbox" name="element" value="水"> 水</label>
+            <label><input type="checkbox" name="element" value="氷"> 氷</label>
+        </div>
+
+        <div id="roulette-display">
+            ここに画像が表示されます
+        </div>
+
+        <div class="buttons">
+            <button id="start-button">スタート</button>
+            <button id="stop-button">ストップ</button>
+        </div>
+    </div>
+
+    <script>
+        // --- ここからがプログラムの心臓部 (JavaScript) ---
+
+        // 4. キャラクターのデータリスト
+        const allCharacters = [
+            { name: 'ディルック', rarity: 5, element: '炎', image: 'diluc.png' },
+            { name: 'モナ', rarity: 5, element: '水', image: 'mona.png' },
+            { name: 'クレー', rarity: 5, element: '炎', image: 'klee.png' },
+            { name: 'ガイア', rarity: 4, element: '氷', image: 'kaeya.png' },
+            { name: 'バーバラ', rarity: 4, element: '水', image: 'barbara.png' },
+            { name: '香菱', rarity: 4, element: '炎', image: 'xiangling.png' },
+            { name: '重雲', rarity: 4, element: '氷', image: 'chongyun.png' },
+            // テスト用に、画像ファイル名をあなたの持っているファイル名に変えてください
+        ];
+
+        // 5. HTMLの要素をJavaScriptで操作できるように準備
+        const rarityCheckboxes = document.querySelectorAll('input[name="rarity"]');
+        const elementCheckboxes = document.querySelectorAll('input[name="element"]');
+        const display = document.getElementById('roulette-display');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+
+        let rouletteInterval; // ルーレットのタイマーを保存しておくための変数
+
+        // 6. 「スタート」ボタンが押された時の処理
+        startButton.onclick = function() {
+            // 現在のチェックボックスの状態から、対象となるキャラクターを絞り込む
+            const selectedRarities = Array.from(rarityCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value));
+            const selectedElements = Array.from(elementCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+            let filteredCharacters = allCharacters.filter(char => {
+                const rarityMatch = selectedRarities.length === 0 || selectedRarities.includes(char.rarity);
+                const elementMatch = selectedElements.length === 0 || selectedElements.includes(char.element);
+                return rarityMatch && elementMatch;
+            });
+
+            // 絞り込み結果が0件だったら、何もしない
+            if (filteredCharacters.length === 0) {
+                display.innerHTML = '対象キャラがいません';
+                return;
+            }
+
+            // ルーレットを回転させる（0.1秒ごとに対象キャラからランダムに1人選んで表示）
+            rouletteInterval = setInterval(function() {
+                const randomIndex = Math.floor(Math.random() * filteredCharacters.length);
+                const randomCharacter = filteredCharacters[randomIndex];
+                display.innerHTML = `<img src="${randomCharacter.image}" alt="${randomCharacter.name}">`;
+            }, 100); // 100ミリ秒 = 0.1秒
+        };
+        
+        // 7. 「ストップ」ボタンが押された時の処理
+        stopButton.onclick = function() {
+            // 回転しているタイマーを停止させる
+            clearInterval(rouletteInterval);
+        };
+
+    </script>
+</body>
+</html>

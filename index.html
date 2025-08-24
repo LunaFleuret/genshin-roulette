@@ -105,6 +105,7 @@
         // 6. 「スタート」ボタンが押された時の処理
         startButton.onclick = function() {
             // 現在のチェックボックスの状態から、対象となるキャラクターを絞り込む
+            clearInterval(rouletteInterval); // 既に動いていたら一旦止める
             const selectedRarities = Array.from(rarityCheckboxes).filter(cb => cb.checked).map(cb => parseInt(cb.value));
             const selectedElements = Array.from(elementCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
 
@@ -112,6 +113,7 @@
                 const rarityMatch = selectedRarities.length === 0 || selectedRarities.includes(char.rarity);
                 const elementMatch = selectedElements.length === 0 || selectedElements.includes(char.element);
                 return rarityMatch && elementMatch;
+                
             });
 
             // 絞り込み結果が0件だったら、何もしない
@@ -138,3 +140,4 @@
 </body>
 
 </html>
+
